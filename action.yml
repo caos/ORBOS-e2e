@@ -36,5 +36,5 @@ runs:
     shell: bash
     run: |
       cd ORBOS
-      echo "${{ inputs.orbconfig }}" > ./orbconfig
+      echo "${{ secrets.ORBCONFIG }}" > ./orbconfig
       go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig --graphitekey ${{ secrets.GRAPHITE_KEY }} --graphiteurl https://graphite-us-central1.grafana.net/metrics --from ${{ github.event.client_payload.from }}
