@@ -1,0 +1,37 @@
+name: ORBOS e2e test
+on:
+  repository_dispatch:
+    types: webhook-trigger
+jobs:
+  test:
+    steps: 
+    - name: ORBOS Checkout
+      uses: actions/checkout@v2
+      with:
+        repository: caos/ORBOS
+        path: ORBOS
+        ref: ${{ github.event.client_payload.branch }}
+    - name: Self Checkout
+      uses: actions/checkout@v2
+      with:
+        path: self
+        fetch-depth: 1
+    - name: Make Cancelling Work for Small Intervalled Runs
+      shell: bash        
+      run: |
+        cd self
+        git config user.name github-actions
+        git config user.email github-actions@github.com          
+        git commit --allow-empty -m "empty commit"
+        git push
+    - name: Cancel Previous Runs
+      uses: styfle/cancel-workflow-action@0.4.1
+      with:
+        access_token: ${{ github.token }}
+    - name: Test
+      id: test
+      shell: bash
+      run: |
+        cd ORBOS
+        echo "${{ secrets.ORBCONFIG }}" > ./orbconfig
+        go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig --graphitekey ${{ secrets.GRAPHITE_KEY }} --graphiteurl https://graphite-us-central1.grafana.net/metrics --from ${{ github.event.client_payload.from }}
