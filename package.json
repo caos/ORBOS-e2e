@@ -1,0 +1,30 @@
+{
+  "name": "orbos-e2e",
+  "version": "1.0.0",
+  "description": "Github Action that runs ORBITER end-to-end tests with a given ORB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caos/ORBOS-e2e.git"
+  },
+  "keywords": [
+    "ORBOS",
+    "e2e",
+    "E2E"
+  ],
+  "author": "CAOS AG",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/caos/ORBOS-e2e/issues"
+  },
+  "homepage": "https://github.com/caos/ORBOS-e2e#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.4",
+    "@actions/github": "^4.0.0",
+    "cancel-workflow-action": "github:styfle/cancel-workflow-action",
+    "checkout": "github:actions/checkout"
+  }
+}
