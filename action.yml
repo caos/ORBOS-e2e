@@ -1,13 +1,14 @@
 name: 'ORBOS E2E Test'
 description: 'Runs ORBITER end-to-end tests with the ORB the action is applied to'
 inputs:
-  orbconfig:  # id of input
+  orbconfig:
     description: 'orbconfig file pointing to the ORB under test'
     required: false
     default: ''
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  personal-access-token:
+    description: 'needed in order to cancel previous runs by using the github workflow api'
+    required: true
+    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'
