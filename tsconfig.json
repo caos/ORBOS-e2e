@@ -12,9 +12,10 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "removeComments": true,
-        "preserveConstEnums": true
+        "preserveConstEnums": true,
+        "typeRoots": [
+            "./node_modules/@types"
+        ]
     },
-    "exclude": [
-        "node_modules"
-    ]
+    "exclude": ["node_modules"]
 }

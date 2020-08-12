@@ -20,4 +20,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
-core.info("It works");
+const github = __importStar(require("@actions/github"));
+const exec = __importStar(require("@actions/exec"));
+async function run() {
+    try {
+        await exec.exec("git", ["clone", `git@github.com:${github.context.repo.owner}/${github.context.repo.owner}.git`]);
+    }
+    catch (error) {
+        core.setFailed(error.message);
+    }
+}
+async function cleanup() {
+}
+if (!process.env['STATE_isPost']) {
+    run();
+}
+else {
+    cleanup();
+}
