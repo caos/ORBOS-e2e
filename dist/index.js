@@ -24,7 +24,7 @@ const github = __importStar(require("@actions/github"));
 const exec = __importStar(require("@actions/exec"));
 async function run() {
     try {
-        await exec.exec("git", ["clone", `git@github.com:${github.context.repo.owner}/${github.context.repo.owner}.git`]);
+        await exec.exec("git", ["clone", `https://${core.getInput("personal-access-token")}@github.com/${github.context.repo.owner}/${github.context.repo.owner}.git`]);
     }
     catch (error) {
         core.setFailed(error.message);

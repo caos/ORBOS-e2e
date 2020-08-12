@@ -7,10 +7,7 @@ async function run(): Promise<void> {
 
   try {
 
-//    const octokit = github.getOctokit(core.getInput('token', {required: true}))
-
-    await exec.exec("git", ["clone", `git@github.com:${github.context.repo.owner}/${github.context.repo.owner}.git`])
-
+    await exec.exec("git", ["clone", `https://${core.getInput("personal-access-token")}@github.com/${github.context.repo.owner}/${github.context.repo.owner}.git`])
 
   } catch (error) {
     core.setFailed(error.message)
