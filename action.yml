@@ -1,13 +1,13 @@
 name: 'ORBOS E2E Test'
 description: 'Runs ORBITER end-to-end tests with the ORB the action is applied to'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
+  orbconfig:  # id of input
+    description: 'orbconfig file pointing to the ORB under test'
+    required: false
+    default: ''
 outputs:
   time: # id of output
     description: 'The time we greeted you'
 runs:
   using: 'node12'
-  main: 'index.js'
+  main: 'dist/index.js'
