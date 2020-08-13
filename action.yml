@@ -6,7 +6,7 @@ inputs:
     required: false
     default: ''
   github-token:
-    description: 'pass it with \"${{ secrets.GITHUB_TOKEN }}\"'
+    description: 'pass the action variable secrets.GITHUB_TOKEN'
     required: true
     default: ''
 runs:
