@@ -22,11 +22,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
 const shell = __importStar(require("shelljs"));
-function run() {
-    cleanup();
+async function run() {
+    await cleanup();
     const { repo: { owner, repo }, payload: { client_payload: { from, branch } } } = github.context;
     let ghToken = core.getInput("github-token");
-    cancelPrevious(ghToken, owner, repo);
+    await cancelPrevious(ghToken, owner, repo);
     handleErr(shell.exec(`
     set -exv
 
@@ -54,25 +54,24 @@ async function cancelPrevious(ghToken, owner, repo) {
         const { data } = await octokit.actions.listWorkflowRuns({
             owner,
             repo,
-            workflow_id,
-            branch: "master"
+            workflow_id
         });
-        console.log(`Found ${data.total_count} runs total.`);
+        core.info(`Found ${data.total_count} runs total.`);
         const runningWorkflows = data.workflow_runs.filter(workflow => workflow.head_branch === '' && workflow.head_sha !== github.context.sha && workflow.status !== 'completed');
-        console.log(`Found ${runningWorkflows.length} runs in progress.`);
+        core.info(`Found ${runningWorkflows.length} runs in progress.`);
         for (const { id, head_sha, status } of runningWorkflows) {
-            console.log('Cancelling another run: ', { id, head_sha, status });
+            core.info(`Cancelling another run: ${id} ${head_sha} ${status}`);
             const res = await octokit.actions.cancelWorkflowRun({
                 owner,
                 repo,
                 run_id: id
             });
-            console.log(`Cancel run ${id} responded with status ${res.status}`);
+            core.info(`Cancel run ${id} responded with status ${res.status}`);
         }
     }
     catch (e) {
         const msg = e.message || e;
-        console.log(`Error while cancelling workflow_id ${workflow_id}: ${msg}`);
+        core.info(`Error while cancelling workflow_id ${workflow_id}: ${msg}`);
     }
 }
 function testFlag(flag, value) {
@@ -84,7 +83,7 @@ function handleErr(result) {
         shell.exit(1);
     }
 }
-function cleanup() {
+async function cleanup() {
     handleErr(shell.rm("-rf", "ORBOS", github.context.repo.repo));
 }
 const IsPost = !!process.env['STATE_isPost'];
