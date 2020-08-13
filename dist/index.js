@@ -29,15 +29,15 @@ function run() {
     handleErr(shell.exec(`
     set -e
 
-    git clone https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
+    git clone --depth 0 https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
     cd ${github.context.repo.repo}
     git config user.name github-actions
     git config user.email github-actions@github.com
-    git commit --allow-empty -m "empty commit
+    git commit --allow-empty -m "empty commit"
     git push
     cd ..
     rm -rf ORBOS
-    git clone https://${ghToken}@github.com/caos/ORBOS.git
+    git clone --depth 0 --no-single-branch https://${ghToken}@github.com/caos/ORBOS.git
     cd ORBOS
     git tag --delete ${branchUnderTest} || true
     git checkout ${branchUnderTest}
