@@ -5,7 +5,7 @@ import * as shell from 'shelljs'
 function run() {
     cleanup()
 
-    const { repo: { owner, repo }, payload: { from, branch } } = github.context;
+    const { repo: { owner, repo }, payload: { client_payload: { from, branch } } } = github.context;
 
     let ghToken = core.getInput("github-token")
     cancelPrevious(ghToken, owner, repo)
@@ -78,8 +78,10 @@ function cleanup(){
   handleErr(shell.rm("-rf", "ORBOS", github.context.repo.repo))
 }
 
+const IsPost = !!process.env['STATE_isPost']
+
 // Main
-if (!process.env['STATE_isPost']) {
+if (!IsPost) {
   run()
 }
 // Post
