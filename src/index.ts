@@ -10,7 +10,7 @@ function run() {
     let ghToken = core.getInput("github-token")
     let branchUnderTest = core.getInput("branch")
     handleErr(shell.exec(`
-    set -e
+    set -ev
 
     git clone --depth 1 https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
     cd ${github.context.repo.repo}
@@ -40,7 +40,7 @@ function testFlag(flag: string, input: string) {
 
 function handleErr(result: shell.ShellString){
   if (result.code !== 0){
-    core.setFailed(result.stderr)
+    core.setFailed("executing script failed")
     shell.exit(1)
   }
 }
