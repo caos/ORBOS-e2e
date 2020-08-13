@@ -1,9 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-//import * as exec from '@actions/exec'
-//import * as io from '@actions/io'
 import * as shell from 'shelljs'
-
 
 function run() {
     cleanup()
@@ -76,7 +73,6 @@ function handleErr(result: shell.ShellString){
     shell.exit(1)
   }
 }
-
 
 function cleanup(){
   handleErr(shell.rm("-rf", "ORBOS", github.context.repo.repo))
