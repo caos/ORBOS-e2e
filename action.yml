@@ -5,8 +5,8 @@ inputs:
     description: 'orbconfig file pointing to the ORB under test'
     required: false
     default: ''
-  personal-access-token:
-    description: 'needed in order to cancel previous runs by using the github workflow api'
+  github-token:
+    description: 'pass it with \"${{ secrets.GITHUB_TOKEN }}\"'
     required: true
     default: ''
 runs:
