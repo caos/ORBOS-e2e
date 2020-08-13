@@ -58,7 +58,7 @@ async function cancelPrevious(ghToken, owner, repo) {
             workflow_id
         });
         core.info(`Found ${data.total_count} runs total.`);
-        const runningWorkflows = data.workflow_runs.filter(workflow => workflow.head_branch === '' && workflow.head_sha !== github.context.sha && workflow.status !== 'completed');
+        const runningWorkflows = data.workflow_runs.filter(workflow => workflow.head_sha !== github.context.sha && workflow.status !== 'completed');
         core.info(`Found ${runningWorkflows.length} runs in progress.`);
         for (const { id, head_sha, status } of runningWorkflows) {
             core.info(`Cancelling another run: ${id} ${head_sha} ${status}`);

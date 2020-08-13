@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as shell from 'shelljs'
 
-async function run() {
+async function run(): Promise<void> {
     await cleanup()
 
     const { repo: { owner, repo }, payload: { client_payload: { from, branch } } } = github.context;
@@ -26,8 +26,7 @@ async function run() {
     git checkout ${branch}
     echo "${core.getInput("orbconfig")}" > ./orbconfig
     go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${testFlag("graphiteurl", core.getInput("graphite-url"))} ${testFlag("graphitekey", core.getInput("graphite-key"))} ${testFlag("from", from)}
-    `
-    ))
+    `))
 }
 
 async function cancelPrevious(ghToken: string, owner: string, repo: string): Promise<void>{
@@ -47,7 +46,7 @@ async function cancelPrevious(ghToken: string, owner: string, repo: string): Pro
       });
       core.info(`Found ${data.total_count} runs total.`)
       const runningWorkflows = data.workflow_runs.filter(
-        workflow => workflow.head_branch === '' && workflow.head_sha !== github.context.sha && workflow.status !== 'completed'
+        workflow => workflow.head_sha !== github.context.sha && workflow.status !== 'completed'
       );
       core.info(`Found ${runningWorkflows.length} runs in progress.`)
       for (const {id, head_sha, status} of runningWorkflows) {
