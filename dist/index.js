@@ -27,7 +27,7 @@ function run() {
     let ghToken = core.getInput("github-token");
     let branchUnderTest = core.getInput("branch");
     handleErr(shell.exec(`
-    set -ev
+    set -exv
 
     git clone --depth 1 https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
     cd ${github.context.repo.repo}
