@@ -9,6 +9,10 @@ inputs:
     description: 'orbconfig file pointing to the ORB under test'
     required: true
     default: ''
+  branch:
+    description: 'the ORBOS branch under test'
+    required: true
+    default: ''
   graphite-key:
     description: 'if passed, state metrics are sent to a grafana cloud graphite endpoint'
     required: false

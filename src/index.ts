@@ -8,7 +8,10 @@ import * as shell from 'shelljs'
 function run() {
     cleanup()
     let ghToken = core.getInput("github-token")
+    let branchUnderTest = core.getInput("branch")
     handleErr(shell.exec(`
+    set -e
+
     git clone https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
     cd ${github.context.repo.repo}
     git config user.name github-actions
@@ -19,6 +22,8 @@ function run() {
     rm -rf ORBOS
     git clone https://${ghToken}@github.com/caos/ORBOS.git
     cd ORBOS
+    git tag --delete ${branchUnderTest} || true
+    git checkout ${branchUnderTest}
     echo "${core.getInput("orbconfig")}" > ./orbconfig
     go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${testFlag("graphiteurl", "graphite-url")} ${testFlag("graphitekey", "graphite-key")} ${testFlag("from", "from")}
     `
