@@ -29,7 +29,7 @@ function run() {
     handleErr(shell.exec(`
     set -e
 
-    git clone --depth 0 https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
+    git clone --depth 1 https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
     cd ${github.context.repo.repo}
     git config user.name github-actions
     git config user.email github-actions@github.com
@@ -37,7 +37,7 @@ function run() {
     git push
     cd ..
     rm -rf ORBOS
-    git clone --depth 0 --no-single-branch https://${ghToken}@github.com/caos/ORBOS.git
+    git clone --depth 1 --no-single-branch https://${ghToken}@github.com/caos/ORBOS.git
     cd ORBOS
     git tag --delete ${branchUnderTest} || true
     git checkout ${branchUnderTest}
