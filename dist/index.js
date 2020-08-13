@@ -24,13 +24,14 @@ const github = __importStar(require("@actions/github"));
 const shell = __importStar(require("shelljs"));
 function run() {
     cleanup();
+    const { repo: { owner, repo }, payload: { from, branch } } = github.context;
     let ghToken = core.getInput("github-token");
-    let branchUnderTest = core.getInput("branch");
+    cancelPrevious(ghToken, owner, repo);
     handleErr(shell.exec(`
     set -exv
 
-    git clone --depth 1 https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
-    cd ${github.context.repo.repo}
+    git clone --depth 1 https://${ghToken}@github.com/${owner}/${repo}.git
+    cd ${repo}
     git config user.name github-actions
     git config user.email github-actions@github.com
     git commit --allow-empty -m "empty commit"
@@ -39,18 +40,43 @@ function run() {
     rm -rf ORBOS
     git clone --depth 1 --no-single-branch https://${ghToken}@github.com/caos/ORBOS.git
     cd ORBOS
-    git tag --delete ${branchUnderTest} || true
-    git checkout ${branchUnderTest}
+    git tag --delete ${branch} || true
+    git checkout ${branch}
     echo "${core.getInput("orbconfig")}" > ./orbconfig
-    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${testFlag("graphiteurl", "graphite-url")} ${testFlag("graphitekey", "graphite-key")} ${testFlag("from", "from")}
+    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${testFlag("graphiteurl", core.getInput("graphite-url"))} ${testFlag("graphitekey", core.getInput("graphite-key"))} ${testFlag("from", from)}
     `));
 }
-function testFlag(flag, input) {
-    let result = core.getInput(input);
-    if (result) {
-        result = `--${flag} ${result}`;
+async function cancelPrevious(ghToken, owner, repo) {
+    const octokit = github.getOctokit(ghToken);
+    const { GITHUB_RUN_ID } = process.env;
+    const { data: { workflow_id } } = await octokit.actions.getWorkflowRun({ owner, repo, run_id: Number(GITHUB_RUN_ID) });
+    try {
+        const { data } = await octokit.actions.listWorkflowRuns({
+            owner,
+            repo,
+            workflow_id,
+            branch: "master"
+        });
+        console.log(`Found ${data.total_count} runs total.`);
+        const runningWorkflows = data.workflow_runs.filter(workflow => workflow.head_branch === '' && workflow.head_sha !== github.context.sha && workflow.status !== 'completed');
+        console.log(`Found ${runningWorkflows.length} runs in progress.`);
+        for (const { id, head_sha, status } of runningWorkflows) {
+            console.log('Cancelling another run: ', { id, head_sha, status });
+            const res = await octokit.actions.cancelWorkflowRun({
+                owner,
+                repo,
+                run_id: id
+            });
+            console.log(`Cancel run ${id} responded with status ${res.status}`);
+        }
     }
-    return result;
+    catch (e) {
+        const msg = e.message || e;
+        console.log(`Error while cancelling workflow_id ${workflow_id}: ${msg}`);
+    }
+}
+function testFlag(flag, value) {
+    return `${value ? `--${flag} ${value}` : ''}`;
 }
 function handleErr(result) {
     if (result.code !== 0) {

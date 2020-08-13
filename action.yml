@@ -9,10 +9,6 @@ inputs:
     description: 'orbconfig file pointing to the ORB under test'
     required: true
     default: ''
-  branch:
-    description: 'the ORBOS branch under test'
-    required: true
-    default: ''
   graphite-key:
     description: 'if passed, state metrics are sent to a grafana cloud graphite endpoint'
     required: false
@@ -21,10 +17,7 @@ inputs:
     description: 'if passed, state metrics are sent to a grafana cloud graphite endpoint'
     required: false
     default: ''
-  from:
-    description: 'e2e test step to start from'
-    required: false
-    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'
+  post: dist/index.js
