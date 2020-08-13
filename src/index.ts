@@ -30,7 +30,10 @@ async function run() {
     ))
 }
 
-async function cancelPrevious(ghToken: string, owner: string, repo: string){
+async function cancelPrevious(ghToken: string, owner: string, repo: string): Promise<void>{
+
+  core.info("Cancelling previous runs")
+
   const octokit = github.getOctokit(ghToken)
   const { GITHUB_RUN_ID } = process.env;
 
@@ -73,7 +76,7 @@ function handleErr(result: shell.ShellString){
   }
 }
 
-async function cleanup(){
+async function cleanup(): Promise<void>{
   handleErr(shell.rm("-rf", "ORBOS", github.context.repo.repo))
 }
 

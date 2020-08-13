@@ -47,6 +47,7 @@ async function run() {
     `));
 }
 async function cancelPrevious(ghToken, owner, repo) {
+    core.info("Cancelling previous runs");
     const octokit = github.getOctokit(ghToken);
     const { GITHUB_RUN_ID } = process.env;
     const { data: { workflow_id } } = await octokit.actions.getWorkflowRun({ owner, repo, run_id: Number(GITHUB_RUN_ID) });
