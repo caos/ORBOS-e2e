@@ -5,48 +5,44 @@ import * as github from '@actions/github'
 import * as shell from 'shelljs'
 
 
-async function run(): Promise<void> {
-
-  try {
-
-    shell.rm("-rf", github.context.repo.repo)
-    trowErr()
-    shell.exec(`git clone https://${core.getInput("github-token")}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git`)
-    trowErr()
-    shell.cd(github.context.repo.repo)
-    trowErr()
-
-    shell.exec("git config user.name github-actions")
-    trowErr()
-    shell.exec("git config user.email github-actions@github.com")
-    trowErr()
-    shell.exec(`git commit --allow-empty -m "empty commit"`)
-    trowErr()
-    shell.exec("git push")
-    trowErr()
-
-    shell.rm("-rf", "ORBOS")
-    trowErr()
-    shell.exec(`git clone https://${core.getInput("github-token")}@github.com/caos/ORBOS.git`)
-    trowErr()
-    shell.cd("ORBOS")
-    trowErr()
-
-  } catch (error) {
-    core.setFailed(error.message)
-  }
+function run() {
+    cleanup()
+    let ghToken = core.getInput("github-token")
+    handleErr(shell.exec(`
+    git clone https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
+    cd ${github.context.repo.repo}
+    git config user.name github-actions
+    git config user.email github-actions@github.com
+    git commit --allow-empty -m "empty commit
+    git push
+    cd ..
+    rm -rf ORBOS
+    git clone https://${ghToken}@github.com/caos/ORBOS.git
+    cd ORBOS
+    echo "${core.getInput("orbconfig")}" > ./orbconfig
+    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${testFlag("graphiteurl", "graphite-url")} ${testFlag("graphitekey", "graphite-key")} ${testFlag("from", "from")}
+    `
+    ))
 }
 
-function trowErr(){
-  let err = shell.error() 
-  if (err){
-    throw err
+function testFlag(flag: string, input: string) {
+  let result = core.getInput(input)
+  if (result) {
+    result = `--${flag} ${result}`
+  }
+  return result
+}
+
+function handleErr(result: shell.ShellString){
+  if (result.code !== 0){
+    core.setFailed(result.stderr)
+    shell.exit(1)
   }
 }
 
 
-async function cleanup(): Promise<void> {
-
+function cleanup(){
+  handleErr(shell.rm("-rf", "ORBOS", github.context.repo.repo))
 }
 
 // Main

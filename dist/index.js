@@ -22,24 +22,39 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
 const shell = __importStar(require("shelljs"));
-async function run() {
-    try {
-        shell.rm("-rf", github.context.repo.repo);
-        shell.exec(`git clone https://${core.getInput("github-token")}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git`);
-        shell.cd(github.context.repo.repo);
-        shell.exec("git config user.name github-actions");
-        shell.exec("git config user.email github-actions@github.com");
-        shell.exec(`git commit --allow-empty -m "empty commit"`);
-        shell.exec("git push");
-        shell.rm("-rf", "ORBOS");
-        shell.exec(`git clone https://${core.getInput("github-token")}@github.com/caos/ORBOS.git`);
-        shell.cd("ORBOS");
+function run() {
+    cleanup();
+    let ghToken = core.getInput("github-token");
+    handleErr(shell.exec(`
+    git clone https://${ghToken}@github.com/${github.context.repo.owner}/${github.context.repo.repo}.git
+    cd ${github.context.repo.repo}
+    git config user.name github-actions
+    git config user.email github-actions@github.com
+    git commit --allow-empty -m "empty commit
+    git push
+    cd ..
+    rm -rf ORBOS
+    git clone https://${ghToken}@github.com/caos/ORBOS.git
+    cd ORBOS
+    echo "${core.getInput("orbconfig")}" > ./orbconfig
+    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${testFlag("graphiteurl", "graphite-url")} ${testFlag("graphitekey", "graphite-key")} ${testFlag("from", "from")}
+    `));
+}
+function testFlag(flag, input) {
+    let result = core.getInput(input);
+    if (result) {
+        result = `--${flag} ${result}`;
     }
-    catch (error) {
-        core.setFailed(error.message);
+    return result;
+}
+function handleErr(result) {
+    if (result.code !== 0) {
+        core.setFailed(result.stderr);
+        shell.exit(1);
     }
 }
-async function cleanup() {
+function cleanup() {
+    handleErr(shell.rm("-rf", "ORBOS", github.context.repo.repo));
 }
 if (!process.env['STATE_isPost']) {
     run();

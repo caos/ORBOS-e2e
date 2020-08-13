@@ -1,13 +1,25 @@
 name: 'ORBOS E2E Test'
 description: 'Runs ORBITER end-to-end tests with the ORB the action is applied to'
 inputs:
-  orbconfig:
-    description: 'orbconfig file pointing to the ORB under test'
-    required: false
-    default: ''
   github-token:
     description: 'pass the action variable secrets.GITHUB_TOKEN'
     required: true
+    default: ''
+  orbconfig:
+    description: 'orbconfig file pointing to the ORB under test'
+    required: true
+    default: ''
+  graphite-key:
+    description: 'if passed, state metrics are sent to a grafana cloud graphite endpoint'
+    required: false
+    default: ''
+  graphite-url:
+    description: 'if passed, state metrics are sent to a grafana cloud graphite endpoint'
+    required: false
+    default: ''
+  from:
+    description: 'e2e test step to start from'
+    required: false
     default: ''
 runs:
   using: 'node12'
