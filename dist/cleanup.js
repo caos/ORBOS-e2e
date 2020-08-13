@@ -19,5 +19,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const run = __importStar(require("./run"));
-run.run();
+exports.cleanup = void 0;
+const helpers = __importStar(require("./helpers"));
+const shell = __importStar(require("shelljs"));
+const github = __importStar(require("@actions/github"));
+async function cleanup() {
+    helpers.handleErr(shell.rm("-rf", "ORBOS", github.context.repo.repo));
+}
+exports.cleanup = cleanup;
+cleanup();

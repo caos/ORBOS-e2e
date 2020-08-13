@@ -19,5 +19,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const run = __importStar(require("./run"));
-run.run();
+exports.handleErr = exports.testFlag = void 0;
+const shell = __importStar(require("shelljs"));
+const core = __importStar(require("@actions/core"));
+function testFlag(flag, value) {
+    return `${value ? `--${flag} ${value}` : ''}`;
+}
+exports.testFlag = testFlag;
+function handleErr(result) {
+    if (result.code !== 0) {
+        core.setFailed("executing script failed");
+        shell.exit(1);
+    }
+}
+exports.handleErr = handleErr;

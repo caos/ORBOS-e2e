@@ -19,5 +19,5 @@ inputs:
     default: ''
 runs:
   using: 'node12'
-  main: 'dist/index.js'
-  post: dist/index.js
+  main: 'dist/run.js'
+  post: dist/cleanup.js
