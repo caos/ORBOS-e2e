@@ -10,6 +10,10 @@ export async function run(): Promise<void> {
 
     const { repo: { owner, repo }, payload: { client_payload: { from, branch, cleanup } } } = github.context;
 
+    core.info(`from=${from}`)
+    core.info(`branch=${branch}`)
+    core.info(`cleanup=${cleanup}`)
+
     let ghToken = core.getInput("github-token")
     await cp.cancelPrevious(ghToken, owner, repo)
     helpers.handleErr(shell.exec(`
