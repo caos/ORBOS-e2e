@@ -32,7 +32,7 @@ export async function run(): Promise<void> {
     git tag --delete ${branch} || true
     git checkout ${branch}
     echo "${core.getInput("orbconfig")}" > ./orbconfig
-    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${helpers.testFlag("graphiteurl", core.getInput("graphite-url"))} ${helpers.testFlag("graphitekey", core.getInput("graphite-key"))} ${helpers.testFlag("from", from)} cleanup=${cleanup}
+    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${helpers.testFlag("graphiteurl", core.getInput("graphite-url"))} ${helpers.testFlag("graphitekey", core.getInput("graphite-key"))} ${helpers.testFlag("from", from)} --cleanup=${cleanup}
     `))
 }
 
