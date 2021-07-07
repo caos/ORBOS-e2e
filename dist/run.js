@@ -28,7 +28,7 @@ const cu = __importStar(require("./cleanup"));
 const cp = __importStar(require("./cancel"));
 async function run() {
     await cu.cleanup();
-    const defaults = { from: "1", branch: "master", cleanup: "false" };
+    const defaults = { from: undefined, branch: undefined, cleanup: undefined };
     const { repo: { owner, repo }, payload: { client_payload: { from: fromWebhook, branch: branchWebhook, cleanup: cleanupWebhook } = defaults, input: { from: fromManual, branch: branchManual, cleanup: cleanupManual } = defaults } } = github.context;
     const from = fromWebhook || fromManual;
     const branch = branchWebhook || branchManual;

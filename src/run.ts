@@ -8,7 +8,7 @@ import * as cp from './cancel'
 export async function run(): Promise<void> {
     await cu.cleanup()
 
-    const defaults = { from: "1", branch: "master", cleanup: "false" }
+    const defaults = { from: undefined, branch: undefined, cleanup: undefined }
     const { 
         repo: { owner, repo },
         payload: { 
