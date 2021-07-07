@@ -1,8 +1,8 @@
 import * as shell from 'shelljs'
 import * as core from '@actions/core'
 
-export function testFlag(flag: string, value: string) {
-    return `${value ? `--${flag} ${value}` : ''}`
+export function testFlag(flag: string, value: string, mask: boolean) {
+    return `${value ? `--${flag} ${mask ? "xxxxxx" : value}` : ''}`
 }
   
 export function handleErr(result: shell.ShellString){

@@ -40,7 +40,7 @@ async function run() {
     core.setOutput("branch", branch);
     core.setOutput("cleanup", cleanup);
     const dryRun = core.getInput("dry-run") == "true";
-    let ghToken = "xxxxxxxxx";
+    let ghToken = "xxxxx";
     if (!dryRun) {
         ghToken = core.getInput("github-token");
     }
@@ -60,7 +60,7 @@ async function run() {
     git tag --delete ${branch} || true
     git checkout ${branch}
     echo "${core.getInput("orbconfig", { required: true })}" > ./orbconfig
-    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${helpers.testFlag("graphiteurl", core.getInput("graphite-url"))} ${helpers.testFlag("graphitekey", core.getInput("graphite-key"))} ${helpers.testFlag("lokiurl", core.getInput("loki-url"))} ${helpers.testFlag("from", from)} --cleanup=${cleanup}
+    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${helpers.testFlag("graphiteurl", core.getInput("graphite-url"), false)} ${helpers.testFlag("graphitekey", core.getInput("graphite-key"), dryRun)} ${helpers.testFlag("lokiurl", core.getInput("loki-url"), dryRun)} ${helpers.testFlag("from", from, false)} --cleanup=${cleanup}
     `;
     if (dryRun) {
         script = `echo "Not executing the following script in dry run mode"

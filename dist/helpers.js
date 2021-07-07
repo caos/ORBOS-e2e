@@ -22,8 +22,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleErr = exports.testFlag = void 0;
 const shell = __importStar(require("shelljs"));
 const core = __importStar(require("@actions/core"));
-function testFlag(flag, value) {
-    return `${value ? `--${flag} ${value}` : ''}`;
+function testFlag(flag, value, mask) {
+    return `${value ? `--${flag} ${mask ? "xxxxxx" : value}` : ''}`;
 }
 exports.testFlag = testFlag;
 function handleErr(result) {
