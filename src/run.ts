@@ -17,7 +17,7 @@ export async function run(): Promise<void> {
                 branch: branchWebhook,
                 cleanup: cleanupWebhook
             } = defaults,
-            input: {
+            inputs: {
                 from: fromManual,
                 branch: branchManual,
                 cleanup: cleanupManual
