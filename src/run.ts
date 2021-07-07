@@ -8,6 +8,7 @@ import * as cp from './cancel'
 export async function run(): Promise<void> {
     await cu.cleanup()
 
+    const defaults = {}
     const { 
         repo: { owner, repo },
         payload: { 
@@ -15,12 +16,12 @@ export async function run(): Promise<void> {
                 from: fromWebhook,
                 branch: branchWebhook,
                 cleanup: cleanupWebhook
-            },
+            } = defaults,
             input: {
                 from: fromManual,
                 branch: branchManual,
                 cleanup: cleanupManual
-            }
+            } = defaults
         }
     } = github.context;
 
