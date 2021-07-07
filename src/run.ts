@@ -8,14 +8,30 @@ import * as cp from './cancel'
 export async function run(): Promise<void> {
     await cu.cleanup()
 
-    const { repo: { owner, repo }, payload: { client_payload: { from, branch, cleanup } } } = github.context;
+    const { 
+        repo: { owner, repo },
+        payload: { 
+            client_payload: {
+                from: fromWebhook,
+                branch: branchWebhook,
+                cleanup: cleanupWebhook
+            },
+            input: {
+                from: fromManual,
+                branch: branchManual,
+                cleanup: cleanupManual
+            }
+        }
+    } = github.context;
 
-    var actualFrom = core.getInput("overwrite-from") || from
-    var omitCleanup = core.getInput("omit-cleanup") || !cleanup
+    const from = fromWebhook || fromManual
+    const branch = branchWebhook || branchManual
+    const cleanup = core.getInput("omit-cleanup") == "true" ? false : 
+        cleanupWebhook == "false" || cleanupManual == "false" ? false : true
 
-    core.info(`from=${actualFrom}`)
+    core.info(`from=${from}`)
     core.info(`branch=${branch}`)
-    core.info(`cleanup=${!omitCleanup}`)
+    core.info(`cleanup=${cleanup}`)
 
     let ghToken = core.getInput("github-token")
     await cp.cancelPrevious(ghToken, owner, repo)
@@ -35,7 +51,7 @@ export async function run(): Promise<void> {
     git tag --delete ${branch} || true
     git checkout ${branch}
     echo "${core.getInput("orbconfig", {required: true})}" > ./orbconfig
-    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${helpers.testFlag("graphiteurl", core.getInput("graphite-url"))} ${helpers.testFlag("graphitekey", core.getInput("graphite-key"))} ${helpers.testFlag("lokiurl", core.getInput("loki-url"))} ${helpers.testFlag("from", actualFrom)} --cleanup=${!omitCleanup}
+    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${helpers.testFlag("graphiteurl", core.getInput("graphite-url"))} ${helpers.testFlag("graphitekey", core.getInput("graphite-key"))} ${helpers.testFlag("lokiurl", core.getInput("loki-url"))} ${helpers.testFlag("from", from)} --cleanup=${cleanup}
     `))
 }
 
