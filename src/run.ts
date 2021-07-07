@@ -8,7 +8,7 @@ import * as cp from './cancel'
 export async function run(): Promise<void> {
     await cu.cleanup()
 
-    const defaults = {}
+    const defaults = { from: "1", branch: "master", cleanup: "false" }
     const { 
         repo: { owner, repo },
         payload: { 
@@ -67,7 +67,7 @@ export async function run(): Promise<void> {
 
     if (dryRun) {
         script = `echo "Not executing the following script in dry run mode"
-        echo "${script}"`
+        echo '${script}'`
     } else {
         await cp.cancelPrevious(ghToken, owner, repo)
     }

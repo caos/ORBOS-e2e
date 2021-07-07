@@ -28,7 +28,7 @@ const cu = __importStar(require("./cleanup"));
 const cp = __importStar(require("./cancel"));
 async function run() {
     await cu.cleanup();
-    const defaults = {};
+    const defaults = { from: "1", branch: "master", cleanup: "false" };
     const { repo: { owner, repo }, payload: { client_payload: { from: fromWebhook, branch: branchWebhook, cleanup: cleanupWebhook } = defaults, input: { from: fromManual, branch: branchManual, cleanup: cleanupManual } = defaults } } = github.context;
     const from = fromWebhook || fromManual;
     const branch = branchWebhook || branchManual;
@@ -65,7 +65,7 @@ async function run() {
     `;
     if (dryRun) {
         script = `echo "Not executing the following script in dry run mode"
-        echo "${script}"`;
+        echo '${script}'`;
     }
     else {
         await cp.cancelPrevious(ghToken, owner, repo);
