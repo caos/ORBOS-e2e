@@ -21,6 +21,10 @@ inputs:
     description: 'if passed, logs are sent to the grafana cloud loki endpoint'
     required: false
     default: ''    
+  dry-run:
+    description: 'run action in dry-run mode'
+    required: false
+    default: 'false'    
 runs:
   using: 'node12'
   main: 'dist/run.js'
