@@ -36,10 +36,16 @@ async function run() {
     core.info(`from=${from}`);
     core.info(`branch=${branch}`);
     core.info(`cleanup=${cleanup}`);
-    let ghToken = core.getInput("github-token");
-    await cp.cancelPrevious(ghToken, owner, repo);
-    helpers.handleErr(shell.exec(`
-    set -exv
+    core.setOutput("from", from);
+    core.setOutput("branch", branch);
+    core.setOutput("cleanup", cleanup);
+    const dryRun = core.getInput("dry-run") == "true";
+    let ghToken = "xxxxxxxxx";
+    if (!dryRun) {
+        ghToken = core.getInput("github-token");
+    }
+    let script = `
+    set -ev
 
     git clone --depth 1 https://${ghToken}@github.com/${owner}/${repo}.git
     cd ${repo}
@@ -55,7 +61,15 @@ async function run() {
     git checkout ${branch}
     echo "${core.getInput("orbconfig", { required: true })}" > ./orbconfig
     go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${helpers.testFlag("graphiteurl", core.getInput("graphite-url"))} ${helpers.testFlag("graphitekey", core.getInput("graphite-key"))} ${helpers.testFlag("lokiurl", core.getInput("loki-url"))} ${helpers.testFlag("from", from)} --cleanup=${cleanup}
-    `));
+    `;
+    if (dryRun) {
+        script = `echo "Not executing the following script in dry run mode"
+        echo "${script}"`;
+    }
+    else {
+        await cp.cancelPrevious(ghToken, owner, repo);
+    }
+    helpers.handleErr(shell.exec(script));
 }
 exports.run = run;
 run();
