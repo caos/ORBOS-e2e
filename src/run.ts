@@ -61,9 +61,10 @@ export async function run(): Promise<void> {
     cd ORBOS
     git tag --delete ${branch} || true
     git checkout ${branch}
-    echo "${core.getInput("orbconfig", {required: true})}" > ./orbconfig
-    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${helpers.testFlag("graphiteurl", core.getInput("graphite-url"), false)} ${helpers.testFlag("graphitekey", core.getInput("graphite-key"), dryRun)} ${helpers.testFlag("lokiurl", core.getInput("loki-url"), dryRun)} ${helpers.testFlag("from", from, false)} --cleanup=${cleanup}
+    cd ./testing
     `
+//    echo "${core.getInput("orbconfig", {required: true})}" > ./orbconfig
+//    go run ./cmd/chore/e2e/run/*.go --orbconfig ./orbconfig ${helpers.testFlag("graphiteurl", core.getInput("graphite-url"), false)} ${helpers.testFlag("graphitekey", core.getInput("graphite-key"), dryRun)} ${helpers.testFlag("lokiurl", core.getInput("loki-url"), dryRun)} ${helpers.testFlag("from", from, false)} --cleanup=${cleanup}
 
     if (dryRun) {
         script = `echo "Not executing the following script in dry run mode"
