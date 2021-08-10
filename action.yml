@@ -5,8 +5,12 @@ inputs:
     description: 'pass the action variable secrets.GITHUB_TOKEN'
     required: true
     default: ''
-  google-chat-webhook:
-    description: 'pass the action variable secrets.GOOGLE_CHAT_WEBHOOK'
+  google-chat-webhook-failure:
+    description: 'pass the action variable secrets.GOOGLE_CHAT_WEBHOOK_FAILURE'
+    required: true
+    default: ''
+  google-chat-webhook-success:
+    description: 'pass the action variable secrets.GOOGLE_CHAT_WEBHOOK_SUCCESS'
     required: true
     default: ''
 # orbconfig:
@@ -44,11 +48,9 @@ runs:
     uses: cypress-io/github-action@v2
     with:
       working-directory: ./testing
-    if: ${{ success() }}
   - name: Google Chat Notification
     uses: Co-qn/google-chat-notification@releases/v1
     with:
       name: ORBOS E2E
-      url: ${{ inputs.google-chat-webhook }}
+      url: ${{ job.status == 'failure' ? inputs.google-chat-webhook-failure : inputs.google-chat-webhook-success }}
       status: ${{ job.status }}
-    if: ${{ failure() }}
