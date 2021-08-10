@@ -1,31 +1,49 @@
 name: 'ORBOS E2E Test'
 description: 'Runs ORBITER end-to-end tests with the ORB the action is applied to'
 inputs:
-  github-token:
-    description: 'pass the action variable secrets.GITHUB_TOKEN'
-    required: true
-    default: ''
-  orbconfig:
-    description: 'orbconfig file pointing to the ORB under test'
-    required: true
-    default: ''
-  graphite-key:
-    description: 'if passed, state metrics are sent to a grafana cloud graphite endpoint'
-    required: false
-    default: ''
-  graphite-url:
-    description: 'if passed, state metrics are sent to a grafana cloud graphite endpoint'
-    required: false
-    default: ''
-  loki-url:
-    description: 'if passed, logs are sent to the grafana cloud loki endpoint'
+# github-token:
+#   description: 'pass the action variable secrets.GITHUB_TOKEN'
+#   required: true
+#   default: ''
+# orbconfig:
+#   description: 'orbconfig file pointing to the ORB under test'
+#   required: true
+#   default: ''
+# graphite-key:
+#   description: 'if passed, state metrics are sent to a grafana cloud graphite endpoint'
+#   required: false
+#   default: ''
+# graphite-url:
+#   description: 'if passed, state metrics are sent to a grafana cloud graphite endpoint'
+#   required: false
+#   default: ''
+  branch:
+    description: 'the ORBOS branch to test'
     required: false
     default: ''    
-  dry-run:
-    description: 'run action in dry-run mode'
-    required: false
-    default: 'false'    
+# dry-run:
+#   description: 'run action in dry-run mode'
+#   required: false
+#   default: 'false'    
 runs:
-  using: 'node12'
-  main: 'dist/run.js'
-  post: dist/cleanup.js
+  using: composite
+  - uses: actions/checkout@v2
+    with:
+      repository: 'caos/orbos'
+      ref: '${{ github.event.inputs.branch || github.event.client_payload.branch }}'
+      token: '${{ secrets.E2E_TOKEN }}'
+  - uses: bahmutov/npm-install@v1
+    with:
+      working-directory: ./testing
+  - name: Cypress run
+    uses: cypress-io/github-action@v2
+    with:
+      working-directory: ./testing
+    if: ${{ success() }}
+  - name: Google Chat Notification
+    uses: Co-qn/google-chat-notification@releases/v1
+    with:
+      name: ORBOS E2E
+      url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+      status: ${{ job.status }}
+    if: ${{ failure() }}
